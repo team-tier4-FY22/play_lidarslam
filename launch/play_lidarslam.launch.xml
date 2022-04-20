@@ -1,0 +1,24 @@
+<launch>
+
+  <arg name="device_ip" default="192.168.1.201"/>
+  <arg name="port" default="2368"/>
+  <arg name="frame_id" default="velodyne"/>
+  <arg name="lidar_link_tf" default="0 0 0.45 0 0 0 1"/>
+  <arg name="output" default="screen"/>
+
+  <include file="$(find-pkg-share velodyne_pointcloud)/launch/VLP-16_points.launch.xml">
+	<arg name="device_ip" value="$(var device_ip)"/>
+	<arg name="port" value="$(var port)"/>
+	<arg name="frame_id" value="$(var frame_id)"/>
+  </include>
+
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="static_transform_publisher_odom" args="0 0 0 0 0 0 1 world map"/>
+  <!-- odom -> base_link will be published by lidarslam_ros2 -->
+  <!--node pkg="tf2_ros" exec="static_transform_publisher" name="static_transform_publisher_base_link" args="0 0 0 0 0 0 1 map base_link"/-->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="static_transform_publisher_velodyne" args="0 0 0.45 0 0 0 1 base_link velodyne"/>
+  <node pkg="rviz2" exec="rviz2" name="rviz2" args="$(find-pkg-share velodyne_launch)/config/play_lidarslam.rviz"/>
+
+  <!-- lidarslam_ros2 -->
+  <include file="$(find-pkg-share play_lidarslam)/launch/lidarslam.launch.py"/>
+  
+</launch>

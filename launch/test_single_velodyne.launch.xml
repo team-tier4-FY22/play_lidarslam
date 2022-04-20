@@ -1,0 +1,19 @@
+<launch>
+
+  <arg name="device_ip" default="192.168.1.201"/>
+  <arg name="port" default="2368"/>
+  <arg name="frame_id" default="velodyne"/>
+  <arg name="use_gui" default="true"/>
+  
+  <include file="$(find-pkg-share velodyne_pointcloud)/launch/VLP-16_points.launch.xml">
+	<arg name="device_ip" value="$(var device_ip)"/>
+	<arg name="port" value="$(var port)"/>
+	<arg name="frame_id" value="$(var frame_id)"/>
+  </include>
+
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="static_transform_publisher" args="0 0 0 0 0 0 1 world velodyne"/>
+
+  <group if="$(var use_gui)">
+	<node pkg="rviz2" exec="rviz2" name="rviz2" args="$(find-pkg-share velodyne_launch)/config/test_single_velodyne.rviz"/>
+  </group>
+</launch>
